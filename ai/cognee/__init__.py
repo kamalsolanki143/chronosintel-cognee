@@ -1,0 +1,1 @@
+"""ChronosIntel — Cognee integration package."""
