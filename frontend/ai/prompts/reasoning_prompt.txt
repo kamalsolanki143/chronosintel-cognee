@@ -1,0 +1,1 @@
+Reason only from the provided evidence. Cite evidence IDs for each conclusion and clearly separate confirmed facts from hypotheses.

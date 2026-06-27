@@ -1,0 +1,1 @@
+Extract entities, events, dates, people, organizations, locations, systems, and evidence references from the provided case material. Return structured JSON.
