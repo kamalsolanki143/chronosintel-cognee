@@ -400,3 +400,42 @@ class CaseVersion(Base):
 
     # Relationships
     case: Mapped["Case"] = relationship("Case", back_populates="versions")
+
+
+# ── User (Auth Module — added by Muskan) ──────────────────────────────────────
+class User(Base):
+    """
+    Platform user account.
+
+    Fields
+    ------
+    id              : UUID primary key
+    full_name       : Display name
+    email           : Unique login identifier (indexed)
+    hashed_password : bcrypt hash — plain password is never stored
+    role            : Access level; defaults to "investigator"
+    is_active       : Soft-delete / suspension flag
+    created_at      : UTC timestamp of account creation
+    """
+
+    __tablename__ = "users"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=_uuid, index=True
+    )
+    full_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    email: Mapped[str] = mapped_column(
+        String(320), nullable=False, unique=True, index=True
+    )
+    hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
+    role: Mapped[str] = mapped_column(
+        String(50), nullable=False, default="investigator"
+    )
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=_now, nullable=False
+    )
+
+    def __repr__(self) -> str:
+        return f"<User id={self.id!r} email={self.email!r} role={self.role!r}>"
+
