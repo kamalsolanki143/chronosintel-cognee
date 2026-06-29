@@ -33,6 +33,7 @@ from app.api import (
     timeline,
     upload,
 )
+from app.api.auth import router as auth_router  # Auth module — Muskan
 from app.config import settings
 from app.database.database import engine
 from app.database.models import Base
@@ -202,6 +203,8 @@ def create_application() -> FastAPI:
     application.include_router(
         feedback.router, prefix="/api/feedback", tags=["Feedback"]
     )
+    # Auth module — Muskan
+    application.include_router(auth_router)
 
     # ── Health Endpoint ───────────────────────────────────────────────────────
     @application.get(

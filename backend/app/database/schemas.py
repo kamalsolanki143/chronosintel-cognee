@@ -11,7 +11,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Optional
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 from app.database.models import (
     CaseStatus,
@@ -395,3 +395,42 @@ class HealthResponse(BaseModel):
     environment: str
     version: str
     services: dict[str, str]
+
+
+# ── Auth Schemas (Auth Module — added by Muskan) ───────────────────────────────
+
+class UserCreate(BaseModel):
+    """Payload for POST /auth/signup."""
+    full_name: str = Field(..., min_length=1, max_length=255, examples=["Jane Doe"])
+    email: EmailStr = Field(..., examples=["jane@example.com"])
+    password: str = Field(..., min_length=8, examples=["Sup3rS3cur3!"])
+
+
+class UserLogin(BaseModel):
+    """Payload for POST /auth/login."""
+    email: EmailStr = Field(..., examples=["jane@example.com"])
+    password: str = Field(..., examples=["Sup3rS3cur3!"])
+
+
+class UserOut(BaseModel):
+    """Safe user response — password is never included."""
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    full_name: str
+    email: EmailStr
+    role: str
+    is_active: bool
+    created_at: datetime
+
+
+class Token(BaseModel):
+    """JWT access-token response from POST /auth/login."""
+    access_token: str
+    token_type: str = "bearer"
+
+
+class TokenData(BaseModel):
+    """Internal: decoded JWT claims used by get_current_user dependency."""
+    sub: Optional[str] = None
+

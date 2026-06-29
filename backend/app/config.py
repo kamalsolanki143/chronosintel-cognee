@@ -65,6 +65,11 @@ class Settings(BaseSettings):
     max_evidence_results: int = 20  # max Cognee search results per query
     evidence_score_threshold: float = 0.5
 
+    # ── JWT Authentication (added by auth module) ─────────────────────────────
+    jwt_secret_key: str = "CHANGE_ME_generate_a_real_secret_key"
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
