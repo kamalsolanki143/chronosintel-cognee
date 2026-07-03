@@ -1,0 +1,23 @@
+[
+  {
+    "timestamp": "2026-07-03T07:30:00Z",
+    "sender": "it_support@chronosintel.com",
+    "recipient": "all-staff@chronosintel.com",
+    "subject": "Scheduled Maintenance: Intranet Portal",
+    "body": "The intranet portal will be down for maintenance this Saturday from 2 AM to 4 AM. Please save your work."
+  },
+  {
+    "timestamp": "2026-07-03T08:00:00Z",
+    "sender": "david.chen@chronosintel.com",
+    "recipient": "it_support@chronosintel.com",
+    "subject": "Lost USB Drive",
+    "body": "Hey IT, I think I misplaced my company encrypted USB drive yesterday around 9 AM. Can you remotely wipe it just in case?"
+  },
+  {
+    "timestamp": "2026-07-03T08:15:00Z",
+    "sender": "elena.design@chronosintel.com",
+    "recipient": "it_support@chronosintel.com",
+    "subject": "Figma License Renewal",
+    "body": "Hi team, my Figma license expires next week. Can we get that renewed?"
+  }
+]

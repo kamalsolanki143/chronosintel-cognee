@@ -1,0 +1,15 @@
+FORENSIC IMAGING & ANALYSIS REPORT
+TARGET DEVICE: ASSET-TAG-8992 (David Chen - Lead Engineer)
+EXAMINER: Cyber Forensics Unit (CFU)
+DATE COMPLETED: 2026-07-03 16:30:00Z
+
+EXECUTIVE SUMMARY:
+A full bit-by-bit forensic image was acquired from ASSET-TAG-8992. Initial analysis focused on network and peripheral activity between 08:00 and 11:00 on July 2nd.
+
+FINDINGS:
+1. Network logs indicate a 50.2GB transfer to IP 104.21.34.12. (Confirmed decoy action).
+2. USB Registry artifacts (USBSTOR) confirm a 'Kingston DataTraveler 64GB' was mounted at 09:12 AM.
+3. File system analysis shows the entire 'Project Nova' directory was copied to the Kingston volume at 09:14 AM.
+
+CONCLUSION: 
+The suspect utilized the USB drive to bypass the Data Loss Prevention (DLP) system. The network transfer to ShadowFund was a decoy intended to distract IT. The actual Project Nova source code was physically removed from the premises via the Kingston DataTraveler.

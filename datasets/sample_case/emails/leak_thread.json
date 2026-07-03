@@ -1,0 +1,10 @@
+[
+  {
+    "timestamp": "2026-07-02T09:15:00Z",
+    "sender": "david.chen@chronosintel.com",
+    "recipient": "external_investor@shadowfund.com",
+    "subject": "Project Nova Source Code",
+    "body": "Attached is the repo for Project Nova. Wire the funds.",
+    "attachments": ["nova_source.zip"]
+  }
+]

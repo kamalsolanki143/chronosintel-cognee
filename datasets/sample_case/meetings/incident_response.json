@@ -1,0 +1,9 @@
+[
+  {
+    "date": "2026-07-02T11:00:00Z",
+    "attendees": ["Sarah", "CEO"],
+    "transcript": [
+      {"speaker": "CEO", "text": "Lock David's account. We have the git logs and the firewall logs."}
+    ]
+  }
+]

@@ -1,0 +1,11 @@
+INCIDENT REPORT - INTERNAL INVESTIGATION
+CASE ID: CI-2026-042
+WITNESS: Sarah (Project Manager)
+DATE RECORDED: 2026-07-03 14:00:00Z
+INTERVIEWER: HR & Legal Team
+
+[STATEMENT BEGINS]
+I am submitting this statement regarding the events of July 2nd. The morning started normally with our standup at 8:30 AM. However, I noticed David acting highly erratic right after the meeting. 
+
+Instead of working from his assigned desk, he moved to the secure staging server terminal. I clearly saw him bypass standard protocol and plug an unauthorized Kingston flash drive into the server. When I asked him about it, he was defensive and claimed he was running a local backup for testing. I didn't think much of it until the DLP alert triggered an hour later.
+[STATEMENT ENDS]

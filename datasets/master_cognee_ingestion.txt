@@ -1,0 +1,47 @@
+=== PHASE 1: INITIAL INCIDENT ===
+[EMAIL] 2026-07-02T09:15:00Z | From: david.chen@chronosintel.com | Subj: Project Nova Source Code | Body: Attached is the repo for Project Nova. Wire the funds.
+[CHAT] 2026-07-02T10:30:00Z | User: Sarah | Msg: @IT_Support Did David Chen just download Project Nova? I got an alert.
+[AUDIT] 2026-07-02T08:30:00Z | Event: ROUTINE_BACKUP | Size: 12.5GB
+[AUDIT] 2026-07-02T09:16:00Z | Event: LARGE_DATA_TRANSFER | Size: 50.2GB
+[AUDIT] 2026-07-02T09:45:00Z | Event: API_CALL_RATE_LIMIT | Size: 0.01GB
+[GIT] 2026-07-02T08:50:00Z | User: mike.frontend | Action: PUSH
+[GIT] 2026-07-02T09:05:00Z | User: david.chen | Action: CLONE
+[GIT] 2026-07-02T09:30:00Z | User: elena.design | Action: PULL
+[MEETING] 2026-07-02T11:00:00Z | Speaker: CEO | Stated: Lock David's account. We have the git logs and the firewall logs.
+[DOCUMENT] Content: PROJECT NOVA - CONFIDENTIAL
+This repository contains the proprietary machine learning models for ChronosIntel.
+Unauthorized access is strictly prohibited.
+
+=== PHASE 2: NEW EVIDENCE DISCOVERED ===
+[UPDATE-EMAIL] 2026-07-03T07:30:00Z | From: it_support@chronosintel.com | Body: The intranet portal will be down for maintenance this Saturday from 2 AM to 4 AM. Please save your work.
+[UPDATE-EMAIL] 2026-07-03T08:00:00Z | From: david.chen@chronosintel.com | Body: Hey IT, I think I misplaced my company encrypted USB drive yesterday around 9 AM. Can you remotely wipe it just in case?
+[UPDATE-EMAIL] 2026-07-03T08:15:00Z | From: elena.design@chronosintel.com | Body: Hi team, my Figma license expires next week. Can we get that renewed?
+[UPDATE-AUDIT] 2026-07-03T09:00:00Z | Event: USB_MOUNT | Details: Standard peripheral connected. Status: Approved.
+[UPDATE-AUDIT] 2026-07-03T10:15:00Z | Event: UNAUTHORIZED_USB_MOUNT | Details: Mass file copy to external media detected prior to network exfiltration.
+[UPDATE-AUDIT] 2026-07-03T11:00:00Z | Event: SYSTEM_UPDATE | Details: Automated security patch applied successfully.
+[UPDATE-WITNESS] Content: INCIDENT REPORT - INTERNAL INVESTIGATION
+CASE ID: CI-2026-042
+WITNESS: Sarah (Project Manager)
+DATE RECORDED: 2026-07-03 14:00:00Z
+INTERVIEWER: HR & Legal Team
+
+[STATEMENT BEGINS]
+I am submitting this statement regarding the events of July 2nd. The morning started normally with our standup at 8:30 AM. However, I noticed David acting highly erratic right after the meeting. 
+
+Instead of working from his assigned desk, he moved to the secure staging server terminal. I clearly saw him bypass standard protocol and plug an unauthorized Kingston flash drive into the server. When I asked him about it, he was defensive and claimed he was running a local backup for testing. I didn't think much of it until the DLP alert triggered an hour later.
+[STATEMENT ENDS]
+[UPDATE-FORENSICS] Content: FORENSIC IMAGING & ANALYSIS REPORT
+TARGET DEVICE: ASSET-TAG-8992 (David Chen - Lead Engineer)
+EXAMINER: Cyber Forensics Unit (CFU)
+DATE COMPLETED: 2026-07-03 16:30:00Z
+
+EXECUTIVE SUMMARY:
+A full bit-by-bit forensic image was acquired from ASSET-TAG-8992. Initial analysis focused on network and peripheral activity between 08:00 and 11:00 on July 2nd.
+
+FINDINGS:
+1. Network logs indicate a 50.2GB transfer to IP 104.21.34.12. (Confirmed decoy action).
+2. USB Registry artifacts (USBSTOR) confirm a 'Kingston DataTraveler 64GB' was mounted at 09:12 AM.
+3. File system analysis shows the entire 'Project Nova' directory was copied to the Kingston volume at 09:14 AM.
+
+CONCLUSION: 
+The suspect utilized the USB drive to bypass the Data Loss Prevention (DLP) system. The network transfer to ShadowFund was a decoy intended to distract IT. The actual Project Nova source code was physically removed from the premises via the Kingston DataTraveler.

@@ -1,0 +1,23 @@
+[
+  {
+    "timestamp": "2026-07-03T09:00:00Z",
+    "event_type": "USB_MOUNT",
+    "device_id": "LOGITECH_WIRELESS_RECEIVER",
+    "user": "sarah.manager",
+    "details": "Standard peripheral connected. Status: Approved."
+  },
+  {
+    "timestamp": "2026-07-03T10:15:00Z",
+    "event_type": "UNAUTHORIZED_USB_MOUNT",
+    "device_id": "KINGSTON_DATATRAVELER_64GB",
+    "user": "david.chen",
+    "details": "Mass file copy to external media detected prior to network exfiltration."
+  },
+  {
+    "timestamp": "2026-07-03T11:00:00Z",
+    "event_type": "SYSTEM_UPDATE",
+    "device_id": "SERVER_NODE_04",
+    "user": "SYSTEM",
+    "details": "Automated security patch applied successfully."
+  }
+]

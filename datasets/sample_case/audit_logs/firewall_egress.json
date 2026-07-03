@@ -1,0 +1,23 @@
+[
+  {
+    "timestamp": "2026-07-02T08:30:00Z",
+    "event_type": "ROUTINE_BACKUP",
+    "source_ip": "10.0.0.5 (DB_SERVER)",
+    "destination_ip": "10.0.0.99 (BACKUP_SERVER)",
+    "data_size_gb": 12.5
+  },
+  {
+    "timestamp": "2026-07-02T09:16:00Z",
+    "event_type": "LARGE_DATA_TRANSFER",
+    "source_ip": "192.168.1.55 (David Chen)",
+    "destination_ip": "104.21.34.12 (Unknown External)",
+    "data_size_gb": 50.2
+  },
+  {
+    "timestamp": "2026-07-02T09:45:00Z",
+    "event_type": "API_CALL_RATE_LIMIT",
+    "source_ip": "192.168.1.102 (Mike - Frontend)",
+    "destination_ip": "api.github.com",
+    "data_size_gb": 0.01
+  }
+]
