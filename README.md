@@ -300,3 +300,9 @@ Building the next generation of AI-powered investigation systems using persisten
 ---
 
 ## ⭐ If you like this project, please give it a star!
+
+# 🤝 Contributors
+
+<a href="https://github.com/kamalsolanki143/chronosintel-cognee/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=kamalsolanki143/chronosintel-cognee" />
+</a>
