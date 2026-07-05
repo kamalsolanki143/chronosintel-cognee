@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import {
   Briefcase,
   FileText,
@@ -112,6 +113,7 @@ function RecentActivityItem({ item }: { item: ActivityItem }) {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const { data: metrics, loading: metricsLoading } = useData(fetchDashboardMetrics);
   const { data: activities, loading: activitiesLoading } = useData(fetchRecentActivity);
   const { data: updates, loading: updatesLoading } = useData(fetchLatestUpdates);
@@ -280,6 +282,7 @@ export default function DashboardPage() {
                 {quickActions.map((action) => (
                   <button
                     key={action.label}
+                    onClick={() => router.push(action.href)}
                     className="group flex flex-col items-start gap-2 rounded-xl border border-border bg-surface-3/40 p-4 text-left transition-all duration-300 hover:border-primary/30 hover:bg-surface-3 hover:shadow-lg hover:shadow-primary/5"
                   >
                     <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${action.color}/10 transition-colors group-hover:${action.color}/20`}>

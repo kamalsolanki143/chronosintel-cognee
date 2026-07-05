@@ -122,7 +122,7 @@ class Case(Base):
         Enum(CaseStatus), default=CaseStatus.CREATED, nullable=False
     )
     investigator: Mapped[str | None] = mapped_column(String(256), nullable=True)
-    tags: Mapped[dict | None] = mapped_column(JSON, nullable=True)   # list of tag strings
+    tags: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)  # list of tag strings
     metadata_: Mapped[dict | None] = mapped_column("metadata", JSON, nullable=True)
     cognee_dataset: Mapped[str | None] = mapped_column(String(256), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
@@ -214,7 +214,7 @@ class Entity(Base):
         Enum(EntityType), default=EntityType.OTHER, nullable=False
     )
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
-    aliases: Mapped[dict | None] = mapped_column(JSON, nullable=True)   # list[str]
+    aliases: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)   # list[str]
     attributes: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     cognee_node_id: Mapped[str | None] = mapped_column(String(512), nullable=True)
     confidence: Mapped[float] = mapped_column(Float, default=1.0, nullable=False)
@@ -249,7 +249,7 @@ class Event(Base):
     event_time_raw: Mapped[str | None] = mapped_column(String(256), nullable=True)  # original string
     event_time_end: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     location: Mapped[str | None] = mapped_column(String(512), nullable=True)
-    participants: Mapped[dict | None] = mapped_column(JSON, nullable=True)  # list[str] entity names
+    participants: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)  # list[str] entity names
     source_document_id: Mapped[str | None] = mapped_column(
         String(36), ForeignKey("documents.id", ondelete="SET NULL"), nullable=True
     )

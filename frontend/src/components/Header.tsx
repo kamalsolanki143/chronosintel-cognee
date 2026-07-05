@@ -71,7 +71,7 @@ export default function Header() {
 
           <div className="hidden md:flex items-center gap-4">
             <a
-              href="/login"
+              href="/dashboard"
               className="text-sm font-medium text-text-secondary hover:text-text transition-colors duration-200"
             >
               Sign In
@@ -116,7 +116,7 @@ export default function Header() {
               ))}
               <hr className="border-border/50" />
               <a
-                href="/login"
+                href="/dashboard"
                 className="block text-sm font-medium text-text-secondary hover:text-text transition-colors py-2"
               >
                 Sign In

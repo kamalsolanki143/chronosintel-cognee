@@ -16,7 +16,7 @@ All uploads trigger:
 from __future__ import annotations
 
 import logging
-from typing import Annotated, List, Optional
+from typing import Optional
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -40,6 +40,29 @@ router = APIRouter()
 
 
 @router.post(
+    "/debug",
+    summary="Debug multipart parsing",
+    description="Temporary endpoint for verifying FastAPI multipart UploadFile parsing.",
+)
+async def debug_upload_parsing(
+    case_id: str = Form(..., description="Target case ID"),
+    files: list[UploadFile] = File(..., description="Evidence files to upload"),
+) -> dict[str, object]:
+    logger.info(
+        "upload_debug parsed case_id=%s count=%d types=%s filenames=%s",
+        case_id,
+        len(files),
+        [str(type(file)) for file in files],
+        [file.filename for file in files],
+    )
+    return {
+        "count": len(files),
+        "types": [str(type(file)) for file in files],
+        "filenames": [file.filename for file in files],
+    }
+
+
+@router.post(
     "/",
     response_model=BatchUploadResponse,
     status_code=status.HTTP_201_CREATED,
@@ -50,15 +73,15 @@ router = APIRouter()
     ),
 )
 async def upload_documents(
-    case_id: Annotated[str, Form(description="Target case ID")],
-    files: Annotated[List[UploadFile], File(description="Evidence files to upload")],
-    document_type: Annotated[
-        Optional[DocumentType], Form(description="Override document type")
-    ] = None,
-    author: Annotated[Optional[str], Form(description="Override document author")] = None,
-    build_graph: Annotated[
-        bool, Form(description="Trigger graph build after upload (default True)")
-    ] = True,
+    case_id: str = Form(..., description="Target case ID"),
+    files: list[UploadFile] = File(..., description="Evidence files to upload"),
+    document_type: Optional[DocumentType] = Form(
+        None, description="Override document type"
+    ),
+    author: Optional[str] = Form(None, description="Override document author"),
+    build_graph: bool = Form(
+        True, description="Trigger graph build after upload (default True)"
+    ),
     db: AsyncSession = Depends(get_db),
 ) -> BatchUploadResponse:
     """
@@ -71,6 +94,17 @@ async def upload_documents(
 
     **Supported formats:** .txt, .pdf, .docx, .csv, .json, .eml, .md, .log
     """
+    logger.info(
+        "upload_documents parsed case_id=%s count=%d types=%s filenames=%s document_type=%s author=%s build_graph=%s",
+        case_id,
+        len(files),
+        [str(type(file)) for file in files],
+        [file.filename for file in files],
+        document_type,
+        author,
+        build_graph,
+    )
+
     # Validate case exists
     try:
         await case_memory_service.get_case(db, case_id)

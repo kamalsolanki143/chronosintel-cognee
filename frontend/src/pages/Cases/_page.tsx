@@ -17,7 +17,9 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { useData } from '@/hooks/useData';
-import { fetchCases } from '@/services/casesService';
+import { useApp } from '@/context/AppContext';
+import { useRouter } from 'next/navigation';
+import { fetchCases, createCase } from '@/services/casesService';
 import { formatDate, formatRelativeTime, getStatusColor, getSeverityColor, truncate } from '@/utils/format';
 import type { Case } from '@/services/mockData';
 
@@ -44,7 +46,9 @@ function Skeleton({ className = '' }: { className?: string }) {
 }
 
 export default function CasesPage() {
-  const { data: cases, loading } = useData(fetchCases);
+  const router = useRouter();
+  const { setSelectedCaseId } = useApp();
+  const { data: cases, loading, refetch } = useData(fetchCases);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [severityFilter, setSeverityFilter] = useState('all');
@@ -53,6 +57,33 @@ export default function CasesPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedCase, setSelectedCase] = useState<Case | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
+
+  // New case creation states
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newDesc, setNewDesc] = useState('');
+  const [newInvestigator, setNewInvestigator] = useState('Dr. Sarah Chen');
+  const [creating, setCreating] = useState(false);
+
+  const handleCreateCase = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTitle.trim() || creating) return;
+    setCreating(true);
+    try {
+      const created = await createCase(newTitle, newDesc, newInvestigator);
+      refetch();
+      setSelectedCaseId(created.id);
+      setIsCreateOpen(false);
+      setNewTitle('');
+      setNewDesc('');
+      router.push('/investigation');
+    } catch (err) {
+      console.error(err);
+      alert(err instanceof Error ? err.message : "Failed to create case");
+    } finally {
+      setCreating(false);
+    }
+  };
 
   const filteredCases = useMemo(() => {
     if (!cases) return [];
@@ -104,7 +135,10 @@ export default function CasesPage() {
               <h1 className="text-3xl font-bold tracking-tight text-text">Cases</h1>
               <p className="mt-1 text-text-secondary">Manage and review investigation cases</p>
             </div>
-            <button className="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-primary-dark active:scale-[0.98] shadow-lg shadow-primary/20">
+            <button
+              onClick={() => setIsCreateOpen(true)}
+              className="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-primary-dark active:scale-[0.98] shadow-lg shadow-primary/20"
+            >
               <Plus size={16} />
               New Case
             </button>
@@ -437,12 +471,103 @@ export default function CasesPage() {
                 </div>
               )}
 
-              <button className="mt-auto flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-medium text-white transition-all hover:bg-primary-dark active:scale-[0.98] shadow-lg shadow-primary/20">
+              <button
+                onClick={() => {
+                  setSelectedCaseId(selectedCase.id);
+                  router.push('/investigation');
+                }}
+                className="mt-auto flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-medium text-white transition-all hover:bg-primary-dark active:scale-[0.98] shadow-lg shadow-primary/20"
+              >
                 <AlertTriangle size={15} />
                 Open Investigation
               </button>
             </div>
           </motion.aside>
+        )}
+      </AnimatePresence>
+
+      {/* Create Case Modal */}
+      <AnimatePresence>
+        {isCreateOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsCreateOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="glass-card relative z-10 w-full max-w-lg overflow-hidden p-6 shadow-2xl"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-text">Create New Investigation</h2>
+                <button
+                  onClick={() => setIsCreateOpen(false)}
+                  className="flex h-7 w-7 items-center justify-center rounded-lg text-text-muted hover:bg-surface-3 hover:text-text"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+              <form onSubmit={handleCreateCase} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1.5">
+                    Case Title *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={newTitle}
+                    onChange={(e) => setNewTitle(e.target.value)}
+                    placeholder="e.g. Project Phoenix Leak"
+                    className="h-10 w-full rounded-xl border border-border bg-surface-3/50 px-3 text-sm text-text placeholder-text-muted outline-none focus:border-primary/50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1.5">
+                    Description
+                  </label>
+                  <textarea
+                    value={newDesc}
+                    onChange={(e) => setNewDesc(e.target.value)}
+                    placeholder="Describe the objective of this investigation..."
+                    className="h-24 w-full resize-none rounded-xl border border-border bg-surface-3/50 p-3 text-sm text-text placeholder-text-muted outline-none focus:border-primary/50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-text-muted mb-1.5">
+                    Lead Investigator
+                  </label>
+                  <input
+                    type="text"
+                    value={newInvestigator}
+                    onChange={(e) => setNewInvestigator(e.target.value)}
+                    placeholder="Investigator name"
+                    className="h-10 w-full rounded-xl border border-border bg-surface-3/50 px-3 text-sm text-text placeholder-text-muted outline-none focus:border-primary/50"
+                  />
+                </div>
+                <div className="flex justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsCreateOpen(false)}
+                    className="rounded-xl border border-border px-4 py-2.5 text-xs font-medium text-text-secondary hover:text-text transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={creating || !newTitle.trim()}
+                    className="rounded-xl bg-primary px-5 py-2.5 text-xs font-medium text-white transition-colors hover:bg-primary-dark disabled:bg-surface-3 disabled:text-text-muted"
+                  >
+                    {creating ? 'Creating...' : 'Create Case'}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>

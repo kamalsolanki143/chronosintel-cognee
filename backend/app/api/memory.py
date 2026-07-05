@@ -20,7 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.database import get_db
 from app.database.models import Document, Entity, Event, Relationship
-from app.database.schemas import MemoryStateResponse, VersionDiff, VersionSnapshot
+from app.database.schemas import MemoryStateResponse, VersionDiff, VersionSnapshot, EntityResponse
 from app.services.case_memory import case_memory_service
 from app.services.change_detector import change_detector_service
 from app.services.version_manager import version_manager_service
@@ -183,3 +183,25 @@ async def reset_case_memory(
     await case_memory_service.delete_case(db, case_id)
 
     return {"message": f"Case '{case_id}' and all associated memory deleted."}
+
+
+@router.get(
+    "/{case_id}/entities",
+    response_model=list[EntityResponse],
+    summary="Get entities for a case",
+)
+async def get_case_entities(
+    case_id: str,
+    db: AsyncSession = Depends(get_db),
+) -> list[EntityResponse]:
+    """Get all entities extracted for a case."""
+    try:
+        await case_memory_service.get_case(db, case_id)
+    except CaseNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc))
+
+    result = await db.execute(
+        select(Entity).where(Entity.case_id == case_id).order_by(Entity.name)
+    )
+    entities = list(result.scalars().all())
+    return entities

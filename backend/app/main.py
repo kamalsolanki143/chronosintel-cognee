@@ -18,6 +18,7 @@ from typing import AsyncGenerator
 
 import cognee
 from fastapi import FastAPI, Request, status
+from fastapi.openapi.utils import get_openapi
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -51,6 +52,25 @@ logging.basicConfig(
     format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
 )
 logger = logging.getLogger(__name__)
+
+
+def _normalize_uploadfile_schema(schema: dict) -> None:
+    if not isinstance(schema, dict):
+        return
+
+    properties = schema.get("properties")
+    if isinstance(properties, dict):
+        for value in properties.values():
+            _normalize_uploadfile_schema(value)
+
+    items = schema.get("items")
+    if isinstance(items, dict):
+        _normalize_uploadfile_schema(items)
+
+    if schema.get("contentMediaType") == "application/octet-stream":
+        schema.pop("contentMediaType", None)
+        schema.setdefault("type", "string")
+        schema["format"] = "binary"
 
 
 # ── Lifespan ─────────────────────────────────────────────────────────────────
@@ -116,6 +136,25 @@ def create_application() -> FastAPI:
         redoc_url="/redoc" if not settings.is_production else None,
         lifespan=lifespan,
     )
+
+    def custom_openapi() -> dict:
+        if application.openapi_schema:
+            return application.openapi_schema
+
+        openapi_schema = get_openapi(
+            title=application.title,
+            version=application.version,
+            description=application.description,
+            routes=application.routes,
+        )
+
+        for schema in openapi_schema.get("components", {}).get("schemas", {}).values():
+            _normalize_uploadfile_schema(schema)
+
+        application.openapi_schema = openapi_schema
+        return application.openapi_schema
+
+    application.openapi = custom_openapi  # type: ignore[method-assign]
 
     # ── CORS Middleware ───────────────────────────────────────────────────────
     application.add_middleware(

@@ -1,21 +1,24 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronDown,
   BookOpen,
-  GitBranch,
-  History,
-  BrainCircuit,
   StickyNote,
   Files,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
 import { useData } from '@/hooks/useData';
+import { useApp } from '@/context/AppContext';
 import { fetchCases } from '@/services/casesService';
 import { formatNumber, getStatusColor, getSeverityColor } from '@/utils/format';
+import InvestigationChat from '@/components/InvestigationChat';
+import UploadPanel from '@/components/UploadPanel';
+import EvidenceChain from '@/components/EvidenceChain';
+import VersionHistory from '@/components/VersionHistory';
+import CaseMemory from '@/components/CaseMemory';
 import type { Case } from '@/services/mockData';
 
 function Skeleton({ className = '' }: { className?: string }) {
@@ -23,11 +26,28 @@ function Skeleton({ className = '' }: { className?: string }) {
 }
 
 export default function InvestigationPage() {
-  const { data: cases, loading: casesLoading } = useData(fetchCases);
-  const [selectedCaseId, setSelectedCaseId] = useState('CASE-001');
+  const { selectedCaseId, setSelectedCaseId } = useApp();
+  const { data: cases, loading: casesLoading, refetch: refetchCases } = useData(fetchCases);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [evidenceOpen, setEvidenceOpen] = useState(true);
   const [notes, setNotes] = useState('');
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const handleUploadComplete = useCallback((newCaseId?: string) => {
+    refetchCases();
+    if (newCaseId) {
+      setSelectedCaseId(newCaseId);
+    }
+    setRefreshTrigger((prev) => prev + 1);
+  }, [refetchCases, setSelectedCaseId]);
+
+  const hasLoadedDefault = useRef(false);
+  useEffect(() => {
+    if (!hasLoadedDefault.current && !selectedCaseId && cases && cases.length > 0) {
+      setSelectedCaseId(cases[0].id);
+      hasLoadedDefault.current = true;
+    }
+  }, [selectedCaseId, cases, setSelectedCaseId]);
 
   const selectedCase = cases?.find((c) => c.id === selectedCaseId) ?? null;
 
@@ -39,7 +59,7 @@ export default function InvestigationPage() {
         <div className="flex items-center gap-3 border-b border-border bg-surface/60 px-6 py-3 backdrop-blur-xl">
           <BookOpen size={16} className="text-text-muted shrink-0" />
           <select
-            value={selectedCaseId}
+            value={selectedCaseId ?? ""}
             onChange={(e) => setSelectedCaseId(e.target.value)}
             className="flex-1 bg-transparent text-sm font-medium text-text outline-none"
           >
@@ -57,40 +77,11 @@ export default function InvestigationPage() {
         {/* Chat + Upload */}
         <div className="flex flex-1 flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto p-6">
-            <div className="flex h-full items-center justify-center">
-              <div className="glass-card flex flex-col items-center gap-4 p-8 text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
-                  <BrainCircuit size={32} className="text-primary" />
-                </div>
-                <h3 className="text-lg font-semibold text-text">Investigation Chat</h3>
-                <p className="max-w-sm text-sm text-text-secondary">
-                  The <span className="font-medium text-text">InvestigationChat</span> component will render here — your AI-powered conversational interface for exploring case evidence.
-                </p>
-                <div className="mt-2 flex gap-2">
-                  <span className="rounded-lg bg-surface-3 px-3 py-1 text-xs text-text-secondary">Evidence analysis</span>
-                  <span className="rounded-lg bg-surface-3 px-3 py-1 text-xs text-text-secondary">Entity queries</span>
-                  <span className="rounded-lg bg-surface-3 px-3 py-1 text-xs text-text-secondary">Timeline Q&A</span>
-                </div>
-              </div>
-            </div>
+            <InvestigationChat caseId={selectedCaseId || undefined} key={`chat-${selectedCaseId}-${refreshTrigger}`} />
           </div>
 
-          {/* Upload Panel */}
-          <div className="border-t border-border bg-surface/60 backdrop-blur-xl">
-            <div className="p-4">
-              <div className="flex items-center gap-3 rounded-xl border-2 border-dashed border-border-light p-4 transition-colors hover:border-primary/30 hover:bg-primary/[0.02]">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                  <Files size={18} className="text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-text">UploadPanel component</p>
-                  <p className="text-xs text-text-muted">Drop evidence files here or click to browse</p>
-                </div>
-                <button className="ml-auto rounded-xl bg-primary/10 px-4 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/20">
-                  Upload
-                </button>
-              </div>
-            </div>
+          <div className="border-t border-border bg-surface/60 backdrop-blur-xl p-4">
+            <UploadPanel caseId={selectedCaseId || null} onUploadComplete={handleUploadComplete} />
           </div>
         </div>
       </div>
@@ -155,41 +146,11 @@ export default function InvestigationPage() {
             )}
           </div>
 
-          {/* EvidenceChain placeholder */}
-          <div className="glass-card overflow-hidden">
-            <div className="flex items-center gap-2 border-b border-border p-3">
-              <GitBranch size={14} className="text-accent" />
-              <span className="text-xs font-semibold text-text">Evidence Chain</span>
-            </div>
-            <div className="p-4 text-center">
-              <p className="text-xs text-text-muted">EvidenceChain component</p>
-              <p className="mt-1 text-[10px] text-text-muted">Linked evidence relationships</p>
-            </div>
-          </div>
+          <EvidenceChain caseId={selectedCaseId || undefined} key={`evidence-${selectedCaseId}-${refreshTrigger}`} />
 
-          {/* VersionHistory placeholder */}
-          <div className="glass-card overflow-hidden">
-            <div className="flex items-center gap-2 border-b border-border p-3">
-              <History size={14} className="text-warning" />
-              <span className="text-xs font-semibold text-text">Version History</span>
-            </div>
-            <div className="p-4 text-center">
-              <p className="text-xs text-text-muted">VersionHistory component</p>
-              <p className="mt-1 text-[10px] text-text-muted">Case version tracking</p>
-            </div>
-          </div>
+          <VersionHistory caseId={selectedCaseId || undefined} key={`version-${selectedCaseId}-${refreshTrigger}`} />
 
-          {/* CaseMemory placeholder */}
-          <div className="glass-card overflow-hidden">
-            <div className="flex items-center gap-2 border-b border-border p-3">
-              <BrainCircuit size={14} className="text-primary" />
-              <span className="text-xs font-semibold text-text">Case Memory</span>
-            </div>
-            <div className="p-4 text-center">
-              <p className="text-xs text-text-muted">CaseMemory component</p>
-              <p className="mt-1 text-[10px] text-text-muted">AI-powered case context memory</p>
-            </div>
-          </div>
+          <CaseMemory caseId={selectedCaseId || undefined} key={`memory-${selectedCaseId}-${refreshTrigger}`} />
 
           {/* Evidence Sources (collapsible) */}
           <div className="glass-card overflow-hidden">

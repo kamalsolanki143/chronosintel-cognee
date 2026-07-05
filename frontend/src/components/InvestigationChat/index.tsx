@@ -42,14 +42,18 @@ export default function InvestigationChat({ caseId }: InvestigationChatProps) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function load() {
       setLoading(true);
+      setError(null);
       try {
         const history = await fetchChatHistory(caseId || "CASE-001");
         setMessages(history);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load chat history");
       } finally {
         setLoading(false);
       }
@@ -80,13 +84,21 @@ export default function InvestigationChat({ caseId }: InvestigationChatProps) {
       setSending(true);
 
       try {
-        const response = await sendChatMessage(content, caseId || "CASE-001");
+        const response = await sendChatMessage(content, caseId || "CASE-001", messages);
         setMessages((prev) => [...prev, response]);
+      } catch (err) {
+        const errorMsg: ChatMessage = {
+          id: `msg-error-${Date.now()}`,
+          sender: "ai",
+          content: `⚠️ Failed to get a response: ${err instanceof Error ? err.message : "Unknown error occurred"}`,
+          timestamp: new Date().toISOString(),
+        };
+        setMessages((prev) => [...prev, errorMsg]);
       } finally {
         setSending(false);
       }
     },
-    [input, sending, caseId]
+    [input, sending, caseId, messages]
   );
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -119,6 +131,24 @@ export default function InvestigationChat({ caseId }: InvestigationChatProps) {
                 </div>
               </div>
             ))}
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center h-full text-center p-4">
+            <p className="text-danger font-medium">Error loading chat</p>
+            <p className="text-sm text-text-secondary mt-1">{error}</p>
+            <button
+              onClick={() => {
+                setError(null);
+                setLoading(true);
+                fetchChatHistory(caseId || "CASE-001")
+                  .then(setMessages)
+                  .catch((err) => setError(err.message))
+                  .finally(() => setLoading(false));
+              }}
+              className="mt-3 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-colors"
+            >
+              Retry
+            </button>
           </div>
         ) : messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center">

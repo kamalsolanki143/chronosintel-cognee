@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
+import { createCase } from "@/services/casesService";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   CloudUpload,
@@ -52,26 +53,38 @@ function formatSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export default function UploadPanel() {
+export default function UploadPanel({
+  caseId,
+  onUploadComplete,
+}: {
+  caseId: string | null;
+  onUploadComplete: (newCaseId?: string) => void;
+}) {
   const [files, setFiles] = useState<UploadFile[]>([]);
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const rawFilesRef = useRef<Record<string, File>>({});
 
   const addFiles = useCallback((fileList: FileList) => {
-    const newFiles: UploadFile[] = Array.from(fileList).map((f, i) => ({
-      id: `file-${Date.now()}-${i}`,
-      name: f.name,
-      size: formatSize(f.size),
-      type: getFileType(f.name),
-      progress: 0,
-      status: "pending" as const,
-    }));
+    const newFiles: UploadFile[] = Array.from(fileList).map((f, i) => {
+      const fileId = `file-${Date.now()}-${i}`;
+      rawFilesRef.current[fileId] = f;
+      return {
+        id: fileId,
+        name: f.name,
+        size: formatSize(f.size),
+        type: getFileType(f.name),
+        progress: 0,
+        status: "pending" as const,
+      };
+    });
     setFiles((prev) => [...prev, ...newFiles]);
   }, []);
 
   const removeFile = useCallback((id: string) => {
     setFiles((prev) => prev.filter((f) => f.id !== id));
+    delete rawFilesRef.current[id];
   }, []);
 
   const handleDrop = useCallback(
@@ -109,33 +122,87 @@ export default function UploadPanel() {
     if (files.length === 0 || uploading) return;
     setUploading(true);
 
+    let activeCaseId = caseId;
+    let isNewCase = false;
+    if (!activeCaseId) {
+      try {
+        const firstFile = files.find(f => f.status === 'pending');
+        const defaultTitle = firstFile ? `Case: ${firstFile.name}` : `Auto Investigation ${new Date().toLocaleDateString()}`;
+        const defaultDesc = `Investigation case automatically created from evidence files upload.`;
+        const newCase = await createCase(defaultTitle, defaultDesc, "Dr. Sarah Chen");
+        activeCaseId = newCase.id;
+        isNewCase = true;
+      } catch (err) {
+        console.error("Failed to create case:", err);
+        setFiles(prev => prev.map(f => f.status === 'pending' ? { ...f, status: 'error', progress: 0 } : f));
+        setUploading(false);
+        return;
+      }
+    }
+
     for (const file of files) {
       if (file.status === "complete") continue;
+      const rawFile = rawFilesRef.current[file.id];
+      if (!rawFile) continue;
+
       setFiles((prev) =>
         prev.map((f) =>
           f.id === file.id ? { ...f, status: "uploading" as const } : f
         )
       );
 
-      for (let p = 0; p <= 100; p += 10) {
-        await new Promise((r) => setTimeout(r, 150));
+      try {
+        await new Promise<void>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", "http://localhost:8000/api/upload/");
+
+          xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+              const percentage = (event.loaded / event.total) * 100;
+              setFiles((prev) =>
+                prev.map((f) =>
+                  f.id === file.id ? { ...f, progress: Math.min(percentage, 95) } : f
+                )
+              );
+            }
+          };
+
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              setFiles((prev) =>
+                prev.map((f) =>
+                  f.id === file.id
+                    ? { ...f, status: "complete" as const, progress: 100 }
+                    : f
+                )
+              );
+              resolve();
+            } else {
+              reject(new Error(`Upload failed with status ${xhr.status}`));
+            }
+          };
+
+          xhr.onerror = () => reject(new Error("Network error"));
+
+          const formData = new FormData();
+          formData.append("case_id", activeCaseId!);
+          formData.append("build_graph", "true");
+          formData.append("files", rawFile);
+
+          xhr.send(formData);
+        });
+      } catch (err) {
+        console.error("Upload error for file:", file.name, err);
         setFiles((prev) =>
           prev.map((f) =>
-            f.id === file.id ? { ...f, progress: p } : f
+            f.id === file.id ? { ...f, status: "error" as const, progress: 0 } : f
           )
         );
       }
-
-      setFiles((prev) =>
-        prev.map((f) =>
-          f.id === file.id
-            ? { ...f, status: "complete" as const, progress: 100 }
-            : f
-        )
-      );
     }
 
     setUploading(false);
+    onUploadComplete(isNewCase ? activeCaseId : undefined);
   };
 
   return (

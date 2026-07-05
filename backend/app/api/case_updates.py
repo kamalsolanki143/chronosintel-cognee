@@ -16,7 +16,7 @@ Workflow:
 from __future__ import annotations
 
 import logging
-from typing import Annotated, List, Optional
+from typing import Optional
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -47,14 +47,14 @@ router = APIRouter()
     ),
 )
 async def update_case_with_evidence(
-    case_id: Annotated[str, Form(description="Target case ID")],
-    files: Annotated[List[UploadFile], File(description="New evidence files")],
-    version_label: Annotated[
-        Optional[str], Form(description="Label for the new version")
-    ] = None,
-    version_description: Annotated[
-        Optional[str], Form(description="Description of what changed")
-    ] = None,
+    case_id: str = Form(..., description="Target case ID"),
+    files: list[UploadFile] = File(..., description="New evidence files"),
+    version_label: Optional[str] = Form(
+        None, description="Label for the new version"
+    ),
+    version_description: Optional[str] = Form(
+        None, description="Description of what changed"
+    ),
     db: AsyncSession = Depends(get_db),
 ) -> CaseUpdateResponse:
     """
