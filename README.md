@@ -216,7 +216,7 @@ NEXT_PUBLIC_API_URL=https://chronosintel-cognee.onrender.com
 
 Video Demo:
 
-(Add YouTube Link)
+https://youtu.be/8nLySAqY3Ok
 
 ---
 
