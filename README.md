@@ -198,23 +198,18 @@ Frontend
 NEXT_PUBLIC_API_URL=https://chronosintel-cognee.onrender.com
 
 ---
-
+```
 ## 📸 Dashboard
-
-![Dashboard](screenshots/dashboard.png)
+![Dashboard](assets/screenshots/dashboard.png)
 
 ## 🔍 Investigation
-
-![Investigation](screenshots/investigation.png)
+![Investigation](assets/screenshots/investigation.png)
 
 ## 🌐 Knowledge Graph
-
-![Graph](screenshots/graph.png)
+![Graph](assets/screenshots/graph.png)
 
 ## ⏳ Timeline
-
-![Timeline](screenshots/timeline.png)
-
+![Timeline](assets/screenshots/timeline.png)
 ---
 
 # 🎥 Demo
