@@ -195,20 +195,25 @@ COGNEE_API_KEY=YOUR_KEY
 Frontend
 
 ```
-NEXT_PUBLIC_API_URL=http://localhost:8000
-```
+NEXT_PUBLIC_API_URL=https://chronosintel-cognee.onrender.com
 
 ---
 
-# 📸 Screenshots
+## 📸 Dashboard
 
-- Dashboard
-- Investigation
-- Knowledge Graph
-- Timeline
-- Reports
-- Case Memory
-- AI Investigation Chat
+![Dashboard](screenshots/dashboard.png)
+
+## 🔍 Investigation
+
+![Investigation](screenshots/investigation.png)
+
+## 🌐 Knowledge Graph
+
+![Graph](screenshots/graph.png)
+
+## ⏳ Timeline
+
+![Timeline](screenshots/timeline.png)
 
 ---
 
