@@ -22,7 +22,7 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from backend.app.api import (
+from app.api import (
     case_updates,
     chat,
     evidence,
@@ -34,11 +34,11 @@ from backend.app.api import (
     timeline,
     upload,
 )
-from backend.app.api.auth import router as auth_router  # Auth module — Muskan
-from backend.app.config import settings
-from backend.app.database.database import engine
-from backend.app.database.models import Base
-from backend.app.utils.exceptions import (
+from app.api.auth import router as auth_router  # Auth module — Muskan
+from app.config import settings
+from app.database.database import engine
+from app.database.models import Base
+from app.utils.exceptions import (
     CaseNotFoundError,
     CogneeError,
     DocumentProcessingError,
