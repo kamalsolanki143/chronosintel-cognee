@@ -15,11 +15,11 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.database.database import get_db
-from backend.app.database.schemas import EvidenceResponse
-from backend.app.services.case_memory import case_memory_service
-from backend.app.services.evidence_chain import evidence_chain_service
-from backend.app.utils.exceptions import CaseNotFoundError
+from app.database.database import get_db
+from app.database.schemas import EvidenceResponse
+from app.services.case_memory import case_memory_service
+from app.services.evidence_chain import evidence_chain_service
+from app.utils.exceptions import CaseNotFoundError
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -100,8 +100,8 @@ async def search_evidence(
     )
 
     # Convert to EvidenceChainItem format
-    from backend.app.database.schemas import EvidenceChainItem
-    from backend.app.database.models import EvidenceType
+    from app.database.schemas import EvidenceChainItem
+    from app.database.models import EvidenceType
     chain_items = [
         EvidenceChainItem(
             id=item.evidence_id or f"search_{i}",

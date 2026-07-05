@@ -22,9 +22,9 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.config import settings
-from backend.app.database.schemas import EvidenceItem, InvestigationResponse
-from backend.app.utils.exceptions import CaseNotFoundError, InsufficientEvidenceError
+from app.config import settings
+from app.database.schemas import EvidenceItem, InvestigationResponse
+from app.utils.exceptions import CaseNotFoundError, InsufficientEvidenceError
 
 logger = logging.getLogger(__name__)
 
@@ -77,8 +77,8 @@ class TemporalReasoningService:
         """
         start_time = time.time()
 
-        from backend.app.services.case_memory import case_memory_service
-        from backend.app.services.evidence_chain import evidence_chain_service
+        from app.services.case_memory import case_memory_service
+        from app.services.evidence_chain import evidence_chain_service
         from ai.cognee.temporal_search import temporal_search_engine
         from ai.gemini.client import gemini_client
 

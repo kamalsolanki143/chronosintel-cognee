@@ -17,7 +17,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from backend.app.config import settings
+from app.config import settings
 
 # ── Engine ────────────────────────────────────────────────────────────────────
 engine = create_async_engine(

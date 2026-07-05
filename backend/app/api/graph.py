@@ -14,9 +14,9 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.database.database import get_db
-from backend.app.database.schemas import GraphResponse
-from backend.app.utils.exceptions import CaseNotFoundError
+from app.database.database import get_db
+from app.database.schemas import GraphResponse
+from app.utils.exceptions import CaseNotFoundError
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -45,7 +45,7 @@ async def get_graph(
     Node types: person, organization, location, project, system, concept, datetime
     Edge labels: communicated_with, mentioned, participated_in, caused, preceded, etc.
     """
-    from backend.app.services.case_memory import case_memory_service
+    from app.services.case_memory import case_memory_service
     from ai.cognee.graph_visualizer import graph_visualizer
 
     try:
@@ -85,8 +85,8 @@ async def get_graph_stats(
     and overall graph health metrics.
     """
     from sqlalchemy import func, select
-    from backend.app.database.models import Entity, EntityType, Relationship, RelationshipType, Event
-    from backend.app.services.case_memory import case_memory_service
+    from app.database.models import Entity, EntityType, Relationship, RelationshipType, Event
+    from app.services.case_memory import case_memory_service
 
     try:
         await case_memory_service.get_case(db, case_id)

@@ -15,7 +15,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any
 
-from backend.app.database.schemas import GraphEdge, GraphNode, GraphResponse
+from app.database.schemas import GraphEdge, GraphNode, GraphResponse
 
 logger = logging.getLogger(__name__)
 

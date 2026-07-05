@@ -18,10 +18,10 @@ Added by: Muskan Yeshminali (Auth Module)
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from backend.app.database.database import get_db
-from backend.app.database.models import User
-from backend.app.database.schemas import Token, UserCreate, UserLogin, UserOut
-from backend.app.services.auth_service import (
+from app.database.database import get_db
+from app.database.models import User
+from app.database.schemas import Token, UserCreate, UserLogin, UserOut
+from app.services.auth_service import (
     create_access_token,
     get_current_user,
     hash_password,

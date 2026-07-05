@@ -63,7 +63,7 @@ class CogneeMemoryManager:
             await cognee.add(text, dataset_name=dataset)
             logger.debug("Document added to Cognee: doc_id=%s", doc_id)
         except Exception as exc:
-            from backend.app.utils.exceptions import CogneeError
+            from app.utils.exceptions import CogneeError
             raise CogneeError(operation="add", reason=str(exc)) from exc
 
     async def add_documents(
@@ -115,7 +115,7 @@ class CogneeMemoryManager:
             await cognee.cognify(datasets=[dataset])
             logger.info("Knowledge graph built for case '%s'", case_id)
         except Exception as exc:
-            from backend.app.utils.exceptions import CogneeError
+            from app.utils.exceptions import CogneeError
             raise CogneeError(operation="cognify", reason=str(exc)) from exc
 
     async def search(
@@ -169,7 +169,7 @@ class CogneeMemoryManager:
             return normalized
 
         except Exception as exc:
-            from backend.app.utils.exceptions import CogneeError
+            from app.utils.exceptions import CogneeError
             raise CogneeError(operation="search", reason=str(exc)) from exc
 
     async def search_chunks(
@@ -215,7 +215,7 @@ class CogneeMemoryManager:
             # Currently prunes all data — replace with dataset-scoped prune when available
             logger.info("Cognee memory reset for case '%s'", case_id)
         except Exception as exc:
-            from backend.app.utils.exceptions import CogneeError
+            from app.utils.exceptions import CogneeError
             raise CogneeError(operation="prune", reason=str(exc)) from exc
 
 

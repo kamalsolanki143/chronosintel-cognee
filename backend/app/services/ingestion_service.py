@@ -27,15 +27,15 @@ from typing import Any
 import aiofiles
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.config import settings
-from backend.app.database.models import Document, DocumentStatus, DocumentType
-from backend.app.utils.exceptions import (
+from app.config import settings
+from app.database.models import Document, DocumentStatus, DocumentType
+from app.utils.exceptions import (
     DocumentProcessingError,
     FileTooLargeError,
     UnsupportedFileTypeError,
 )
-from backend.app.utils.file_parser import file_parser
-from backend.app.utils.text_chunker import text_chunker
+from app.utils.file_parser import file_parser
+from app.utils.text_chunker import text_chunker
 
 logger = logging.getLogger(__name__)
 

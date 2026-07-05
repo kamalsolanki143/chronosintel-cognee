@@ -19,9 +19,9 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.database.models import CaseVersion, Entity, Relationship
-from backend.app.database.schemas import VersionDiff
-from backend.app.utils.exceptions import VersionNotFoundError
+from app.database.models import CaseVersion, Entity, Relationship
+from app.database.schemas import VersionDiff
+from app.utils.exceptions import VersionNotFoundError
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +58,7 @@ class ChangeDetectorService:
         Returns:
             VersionDiff with lists of new/removed entities and new events.
         """
-        from backend.app.services.version_manager import version_manager_service
+        from app.services.version_manager import version_manager_service
 
         snap_a = await version_manager_service.get_snapshot(db, case_id, version_a)
         snap_b = await version_manager_service.get_snapshot(db, case_id, version_b)
@@ -148,7 +148,7 @@ class ChangeDetectorService:
         to_time: Any,
     ) -> list[dict[str, str]]:
         """Fetch new relationships created between two timestamps."""
-        from backend.app.database.models import Relationship
+        from app.database.models import Relationship
 
         result = await db.execute(
             select(Relationship)

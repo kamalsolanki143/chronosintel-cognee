@@ -21,19 +21,19 @@ from typing import Optional
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.database.database import get_db
-from backend.app.database.models import CaseStatus, DocumentType
-from backend.app.database.schemas import (
+from app.database.database import get_db
+from app.database.models import CaseStatus, DocumentType
+from app.database.schemas import (
     BatchUploadResponse,
     CaseCreate,
     CaseResponse,
     DocumentResponse,
     UploadResponse,
 )
-from backend.app.services.case_memory import case_memory_service
-from backend.app.services.graph_builder import graph_builder_service
-from backend.app.services.ingestion_service import ingestion_service
-from backend.app.utils.exceptions import CaseNotFoundError
+from app.services.case_memory import case_memory_service
+from app.services.graph_builder import graph_builder_service
+from app.services.ingestion_service import ingestion_service
+from app.utils.exceptions import CaseNotFoundError
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -212,7 +212,7 @@ async def list_documents(
 ) -> list[DocumentResponse]:
     """List all uploaded documents for an investigation case."""
     from sqlalchemy import select
-    from backend.app.database.models import Document
+    from app.database.models import Document
 
     try:
         await case_memory_service.get_case(db, case_id)
