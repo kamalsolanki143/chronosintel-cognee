@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import dynamic from 'next/dynamic';
 import {
   Search,
   X,
@@ -23,6 +24,11 @@ import { useData } from '@/hooks/useData';
 import { fetchGraphData, fetchNodeDetails } from '@/services/graphService';
 import { formatDate, getEntityColor } from '@/utils/format';
 import type { GraphNode, GraphLink } from '@/services/mockData';
+
+const KnowledgeGraph = dynamic(() => import('@/components/KnowledgeGraph'), {
+  ssr: false,
+  loading: () => <div className="animate-pulse bg-surface-2 h-[500px] rounded-xl flex items-center justify-center text-xs text-text-muted">Loading Knowledge Graph...</div>
+});
 
 const entityTypes = [
   { key: 'person', label: 'Person', icon: Users, color: 'text-blue-400' },
@@ -49,11 +55,20 @@ function Skeleton({ className = '' }: { className?: string }) {
 }
 
 export default function GraphPage() {
-  const { data: graphData, loading } = useData(() => fetchGraphData('CASE-001'));
+  const fetchGraph = useCallback(() => fetchGraphData('CASE-001'), []);
+  const { data: graphData, loading } = useData(fetchGraph);
   const [typeFilters, setTypeFilters] = useState<string[]>(entityTypes.map((t) => t.key));
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const toggleType = (key: string) => {
     setTypeFilters((prev) =>
@@ -78,21 +93,24 @@ export default function GraphPage() {
   };
 
   return (
-    <div className="flex h-full overflow-hidden">
+    <div className="flex flex-col lg:flex-row h-full overflow-hidden relative">
       {/* Left Control Panel */}
       <motion.aside
-        animate={{ width: sidebarOpen ? 280 : 0 }}
+        animate={{
+          width: isMobile ? '100%' : (sidebarOpen ? 280 : 0),
+          height: isMobile ? (sidebarOpen ? 'auto' : 48) : '100%'
+        }}
         transition={{ duration: 0.3, ease: 'easeInOut' as const }}
-        className="relative overflow-hidden border-r border-border bg-surface/95"
+        className="relative overflow-hidden border-b lg:border-b-0 lg:border-r border-border bg-surface/95 w-full lg:w-auto z-20"
       >
         <button
           onClick={() => setSidebarOpen((p) => !p)}
-          className="absolute -right-5 top-1/2 z-10 flex h-8 w-5 items-center justify-center rounded-r-lg border border-l-0 border-border bg-surface-2 text-text-muted hover:text-text"
+          className="absolute right-4 lg:-right-5 top-2 lg:top-1/2 z-30 flex h-8 w-8 lg:h-8 lg:w-5 items-center justify-center rounded-lg lg:rounded-l-none lg:rounded-r-lg border border-border bg-surface-2 text-text-muted hover:text-text"
         >
-          {sidebarOpen ? <ChevronLeft size={12} /> : <ChevronRight size={12} />}
+          {sidebarOpen ? (isMobile ? <X size={14} /> : <ChevronLeft size={12} />) : (isMobile ? <Search size={14} /> : <ChevronRight size={12} />)}
         </button>
 
-        <div className="h-full w-[280px] overflow-y-auto p-4 space-y-5">
+        <div className="h-full w-full lg:w-[280px] overflow-y-auto p-4 space-y-5 pt-12 lg:pt-4">
           {/* Search */}
           <div>
             <div className="relative">
@@ -178,7 +196,7 @@ export default function GraphPage() {
       </motion.aside>
 
       {/* Main Graph Area */}
-      <div className="relative flex-1 overflow-hidden bg-surface">
+      <div className="relative flex-1 overflow-hidden bg-surface h-full min-h-[500px]">
         {loading ? (
           <div className="flex h-full items-center justify-center">
             <div className="space-y-4 text-center">
@@ -187,35 +205,7 @@ export default function GraphPage() {
             </div>
           </div>
         ) : (
-          <>
-            {/* KnowledgeGraph placeholder */}
-            <div className="flex h-full items-center justify-center p-8">
-              <div className="glass-card relative flex flex-col items-center gap-4 p-10 text-center max-w-lg">
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary/[0.03] to-accent/[0.03]" />
-                <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-accent/20 ring-1 ring-white/10">
-                  <Layers size={40} className="text-primary" />
-                </div>
-                <h3 className="text-lg font-semibold text-text">Knowledge Graph</h3>
-                <p className="text-sm text-text-secondary">
-                  The <span className="font-medium text-text">KnowledgeGraph</span> component renders here — an interactive force-directed graph visualization of entities and their relationships.
-                </p>
-                <div className="flex flex-wrap justify-center gap-2">
-                  {filteredNodes.map((n) => (
-                    <button
-                      key={n.id}
-                      onClick={() => setSelectedNode(n)}
-                      className="rounded-full border border-border bg-surface-3/60 px-3 py-1 text-xs text-text-secondary transition-colors hover:border-primary/30"
-                    >
-                      {n.name}
-                    </button>
-                  ))}
-                </div>
-                <p className="text-xs text-text-muted">
-                  {filteredNodes.length} nodes &middot; {(graphData?.links ?? []).length} connections
-                </p>
-              </div>
-            </div>
-          </>
+          <KnowledgeGraph caseId="CASE-001" />
         )}
       </div>
 
@@ -224,12 +214,15 @@ export default function GraphPage() {
         {selectedNode && (
           <motion.aside
             initial={{ width: 0, opacity: 0 }}
-            animate={{ width: 320, opacity: 1 }}
+            animate={{
+              width: isMobile ? '100%' : 320,
+              opacity: 1
+            }}
             exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: 'easeInOut' as const }}
-            className="overflow-hidden border-l border-border bg-surface/95"
+            className="absolute lg:relative right-0 top-0 h-full overflow-hidden border-l border-border bg-surface/95 z-20 w-full lg:w-auto"
           >
-            <div className="h-full w-[320px] overflow-y-auto p-5">
+            <div className="h-full w-full lg:w-[320px] overflow-y-auto p-5">
               <div className="flex items-start justify-between mb-5">
                 <div>
                   <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${getEntityColor(selectedNode.type)}`}>

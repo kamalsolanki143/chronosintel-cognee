@@ -25,9 +25,9 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
-from app.config import settings
-from app.database.database import get_db
-from app.database.models import User
+from backend.app.config import settings
+from backend.app.database.database import get_db
+from backend.app.database.models import User
 
 # ---------------------------------------------------------------------------
 # bcrypt work factor

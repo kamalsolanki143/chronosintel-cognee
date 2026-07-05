@@ -18,7 +18,7 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.schemas import ChatMessage, ChatResponse, EvidenceItem
+from backend.app.database.schemas import ChatMessage, ChatResponse, EvidenceItem
 
 logger = logging.getLogger(__name__)
 
@@ -61,8 +61,8 @@ class GroundedSummaryService:
         """
         start_time = time.time()
 
-        from app.services.case_memory import case_memory_service
-        from app.services.evidence_chain import evidence_chain_service
+        from backend.app.services.case_memory import case_memory_service
+        from backend.app.services.evidence_chain import evidence_chain_service
         from ai.cognee.temporal_search import temporal_search_engine
         from ai.gemini.client import gemini_client
 

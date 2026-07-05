@@ -94,7 +94,7 @@ export function Sidebar() {
 
   useEffect(() => {
     document.body.style.overflow =
-      sidebarOpen && window.innerWidth < 768 ? 'hidden' : '';
+      sidebarOpen && window.innerWidth < 1024 ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';
     };
@@ -111,7 +111,7 @@ export function Sidebar() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={toggleSidebar}
-            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
           />
         )}
       </AnimatePresence>
@@ -127,11 +127,11 @@ export function Sidebar() {
           sidebarOpen
             ? 'shadow-xl shadow-black/20'
             : 'shadow-lg shadow-black/10'
-        } md:relative md:top-0 md:h-screen ${
+        } lg:relative lg:top-0 lg:h-screen ${
           sidebarOpen
             ? 'translate-x-0'
-            : '-translate-x-full md:translate-x-0'
-        } transition-transform duration-250 ease-out md:transition-none`}
+            : '-translate-x-full lg:translate-x-0'
+        } transition-transform duration-250 ease-out lg:transition-none`}
       >
         {/* Logo section in sidebar (desktop collapsed header) */}
         <div

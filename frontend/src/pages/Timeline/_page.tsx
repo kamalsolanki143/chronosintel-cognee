@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Play,
@@ -35,8 +35,53 @@ function Skeleton({ className = '' }: { className?: string }) {
 export default function TimelinePage() {
   const { data: cases } = useData(fetchCases);
   const [selectedCaseId, setSelectedCaseId] = useState('CASE-001');
-  const { data: events, loading: eventsLoading } = useData(() => fetchTimelineEvents(selectedCaseId));
-  const { data: versions, loading: versionsLoading } = useData(() => fetchVersionHistory(selectedCaseId));
+
+  const [events, setEvents] = useState<TimelineEvent[]>([]);
+  const [eventsLoading, setEventsLoading] = useState(true);
+  const [versions, setVersions] = useState<VersionEntry[]>([]);
+  const [versionsLoading, setVersionsLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    async function load() {
+      setEventsLoading(true);
+      try {
+        const data = await fetchTimelineEvents(selectedCaseId);
+        if (active) {
+          setEvents(data);
+        }
+      } finally {
+        if (active) {
+          setEventsLoading(false);
+        }
+      }
+    }
+    load();
+    return () => {
+      active = false;
+    };
+  }, [selectedCaseId]);
+
+  useEffect(() => {
+    let active = true;
+    async function load() {
+      setVersionsLoading(true);
+      try {
+        const data = await fetchVersionHistory(selectedCaseId);
+        if (active) {
+          setVersions(data);
+        }
+      } finally {
+        if (active) {
+          setVersionsLoading(false);
+        }
+      }
+    }
+    load();
+    return () => {
+      active = false;
+    };
+  }, [selectedCaseId]);
 
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
@@ -45,6 +90,14 @@ export default function TimelinePage() {
   const [selectedEvent, setSelectedEvent] = useState<TimelineEvent | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const filteredEvents = useMemo(() => {
     if (!events) return [];
@@ -74,21 +127,24 @@ export default function TimelinePage() {
   };
 
   return (
-    <div className="flex h-full overflow-hidden">
+    <div className="flex flex-col lg:flex-row h-full overflow-hidden">
       {/* Left Sidebar */}
       <motion.aside
-        animate={{ width: sidebarCollapsed ? 0 : 280 }}
+        animate={{
+          width: isMobile ? '100%' : (sidebarCollapsed ? 0 : 280),
+          height: isMobile ? (sidebarCollapsed ? 48 : 'auto') : '100%',
+        }}
         transition={{ duration: 0.3, ease: 'easeInOut' as const }}
-        className="relative overflow-hidden border-r border-border bg-surface/95"
+        className="relative overflow-hidden border-b lg:border-b-0 lg:border-r border-border bg-surface/95 w-full lg:w-auto z-20"
       >
         <button
           onClick={() => setSidebarCollapsed((p) => !p)}
-          className="absolute -right-5 top-1/2 z-10 flex h-8 w-5 items-center justify-center rounded-r-lg border border-l-0 border-border bg-surface-2 text-text-muted hover:text-text"
+          className="absolute left-1/2 lg:left-auto lg:right-0 lg:top-1/2 top-2 z-30 flex h-6 w-8 lg:h-8 lg:w-5 -translate-x-1/2 lg:translate-x-full items-center justify-center rounded-lg lg:rounded-l-none lg:rounded-r-lg border border-border bg-surface-2 text-text-muted hover:text-text"
         >
-          {sidebarCollapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
+          {sidebarCollapsed ? (isMobile ? <ChevronDown size={12} /> : <ChevronRight size={12} />) : (isMobile ? <ChevronDown className="rotate-180" size={12} /> : <ChevronLeft size={12} />)}
         </button>
 
-        <div className="h-full w-[280px] overflow-y-auto p-4 space-y-5">
+        <div className="h-full w-full lg:w-[280px] overflow-y-auto p-4 space-y-5 pt-12 lg:pt-4">
           {/* Version History */}
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted mb-3">
@@ -230,18 +286,26 @@ export default function TimelinePage() {
           {/* Category Filters */}
           <AnimatePresence>
             {showFilters && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="overflow-hidden"
-              >
-                <div className="flex flex-wrap gap-2 pt-3">
-                  {categories.map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => setCategoryFilter(cat === categoryFilter ? 'all' : cat)}
-                      className={`rounded-lg px-3 py-1.5 text-xs capitalize transition-all ${
+              <>
+                <div onClick={() => setShowFilters(false)} className="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm md:hidden" />
+                <motion.div
+                  initial={isMobile ? { y: '100%' } : { height: 0, opacity: 0 }}
+                  animate={isMobile ? { y: 0 } : { height: 'auto', opacity: 1 }}
+                  exit={isMobile ? { y: '100%' } : { height: 0, opacity: 0 }}
+                  className="overflow-hidden fixed md:static bottom-0 inset-x-0 z-40 bg-surface-2 md:bg-transparent border-t md:border-t-0 border-border p-4 md:p-0 rounded-t-2xl md:rounded-none shadow-2xl md:shadow-none"
+                >
+                  <div className="flex items-center justify-between mb-3 md:hidden">
+                    <span className="text-sm font-semibold text-text">Filter Events</span>
+                    <button onClick={() => setShowFilters(false)} className="text-text-muted hover:text-text">
+                      <X size={16} />
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap gap-2 pt-3">
+                    {categories.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => setCategoryFilter(cat === categoryFilter ? 'all' : cat)}
+                        className={`rounded-lg px-3 py-1.5 text-xs capitalize transition-all ${
                         categoryFilter === cat
                           ? 'bg-primary/15 text-primary ring-1 ring-primary/30'
                           : 'bg-surface-3/40 text-text-secondary hover:bg-surface-3'
@@ -252,6 +316,7 @@ export default function TimelinePage() {
                   ))}
                 </div>
               </motion.div>
+              </>
             )}
           </AnimatePresence>
         </div>

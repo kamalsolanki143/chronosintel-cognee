@@ -21,7 +21,7 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.models import (
+from backend.app.database.models import (
     Case,
     CaseStatus,
     Entity,
@@ -29,7 +29,7 @@ from app.database.models import (
     Relationship,
     RelationshipType,
 )
-from app.utils.exceptions import CaseNotFoundError, GraphBuildError
+from backend.app.utils.exceptions import CaseNotFoundError, GraphBuildError
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +61,7 @@ class GraphBuilderService:
             CaseNotFoundError: If the case doesn't exist.
             GraphBuildError:   If Cognee cognify fails.
         """
-        from app.services.case_memory import case_memory_service
+        from backend.app.services.case_memory import case_memory_service
 
         # Validate case exists
         case = await case_memory_service.get_case(db, case_id)

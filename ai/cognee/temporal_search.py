@@ -19,7 +19,7 @@ import re
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from app.config import settings
+from backend.app.config import settings
 
 logger = logging.getLogger(__name__)
 

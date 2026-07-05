@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import {
   Briefcase,
   FileText,
@@ -15,11 +16,15 @@ import {
   ChevronRight,
   FileBarChart,
 } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { useData } from '@/hooks/useData';
 import { fetchDashboardMetrics, fetchRecentActivity, fetchLatestUpdates } from '@/services/dashboardService';
 import { formatRelativeTime, getInitials } from '@/utils/format';
 import type { ActivityItem, CaseUpdate } from '@/services/mockData';
+
+const DashboardCharts = dynamic(() => import('@/components/DashboardCharts'), {
+  ssr: false,
+  loading: () => <div className="animate-pulse bg-surface-3 h-56 rounded-lg flex items-center justify-center text-xs text-text-muted">Loading charts...</div>
+});
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -163,7 +168,7 @@ export default function DashboardPage() {
         </div>
 
         {/* 2-Column Grid */}
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
           {/* Left Column */}
           <div className="space-y-6">
             {/* Weekly Activity Chart */}
@@ -175,40 +180,10 @@ export default function DashboardPage() {
               {metricsLoading ? (
                 <Skeleton className="h-56 rounded-lg" />
               ) : (
-                <div className="h-56">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={chartData}>
-                      <defs>
-                        <linearGradient id="casesGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-                          <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
-                        </linearGradient>
-                        <linearGradient id="evidenceGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.3} />
-                          <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#1e2532" />
-                      <XAxis dataKey="day" stroke="#64748b" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
-                      <YAxis stroke="#64748b" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: '#1a1f28',
-                          border: '1px solid #2a3344',
-                          borderRadius: '8px',
-                          color: '#f1f5f9',
-                          fontSize: '12px',
-                        }}
-                      />
-                      <Area type="monotone" dataKey="cases" stroke="#6366f1" fill="url(#casesGrad)" strokeWidth={2} />
-                      <Area type="monotone" dataKey="evidence" stroke="#06b6d4" fill="url(#evidenceGrad)" strokeWidth={2} />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
+                <DashboardCharts chartData={chartData} />
               )}
             </motion.div>
 
-            {/* Recent Activity */}
             <motion.div variants={itemVariants} className="glass-card p-5">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-text">Recent Activity</h2>

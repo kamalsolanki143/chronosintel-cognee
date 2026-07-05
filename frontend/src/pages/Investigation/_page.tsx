@@ -33,6 +33,14 @@ export default function InvestigationPage() {
   const [notes, setNotes] = useState('');
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const handleUploadComplete = useCallback((newCaseId?: string) => {
     refetchCases();
     if (newCaseId) {
@@ -52,7 +60,7 @@ export default function InvestigationPage() {
   const selectedCase = cases?.find((c) => c.id === selectedCaseId) ?? null;
 
   return (
-    <div className="flex h-full overflow-hidden">
+    <div className="flex flex-col lg:flex-row h-full overflow-hidden">
       {/* Main Area */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Case Selector */}
@@ -88,18 +96,21 @@ export default function InvestigationPage() {
 
       {/* Right Sidebar */}
       <motion.aside
-        animate={{ width: sidebarCollapsed ? 0 : 360 }}
+        animate={{
+          width: isMobile ? '100%' : (sidebarCollapsed ? 0 : 360),
+          height: isMobile ? (sidebarCollapsed ? 48 : 'auto') : '100%',
+        }}
         transition={{ duration: 0.3, ease: 'easeInOut' as const }}
-        className="relative overflow-hidden border-l border-border bg-surface/95"
+        className="relative overflow-hidden border-t lg:border-t-0 lg:border-l border-border bg-surface/95 w-full lg:w-auto"
       >
         <button
           onClick={() => setSidebarCollapsed((p) => !p)}
-          className="absolute left-0 top-1/2 z-10 flex h-8 w-5 -translate-x-full items-center justify-center rounded-l-lg border border-border bg-surface-2 text-text-muted hover:text-text"
+          className="absolute left-1/2 lg:left-0 lg:top-1/2 top-0 z-10 flex h-5 w-8 lg:h-8 lg:w-5 -translate-x-1/2 lg:-translate-x-full items-center justify-center rounded-b-lg lg:rounded-b-none lg:rounded-l-lg border border-border bg-surface-2 text-text-muted hover:text-text"
         >
-          {sidebarCollapsed ? <ChevronLeft size={12} /> : <ChevronRight size={12} />}
+          {sidebarCollapsed ? (isMobile ? <ChevronDown size={12} /> : <ChevronLeft size={12} />) : (isMobile ? <ChevronDown className="rotate-180" size={12} /> : <ChevronRight size={12} />)}
         </button>
 
-        <div className="h-full w-[360px] overflow-y-auto p-5 space-y-5">
+        <div className="h-full w-full lg:w-[360px] overflow-y-auto p-5 space-y-5">
           {/* Case Summary */}
           <div className="glass-card p-4">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted mb-3">Case Summary</h3>

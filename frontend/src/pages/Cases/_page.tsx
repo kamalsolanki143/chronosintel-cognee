@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
@@ -57,6 +57,14 @@ export default function CasesPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedCase, setSelectedCase] = useState<Case | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
+
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // New case creation states
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -385,12 +393,15 @@ export default function CasesPage() {
         {selectedCase && (
           <motion.aside
             initial={{ width: 0, opacity: 0 }}
-            animate={{ width: 380, opacity: 1 }}
+            animate={{
+              width: isMobile ? '100%' : 380,
+              opacity: 1
+            }}
             exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: 'easeInOut' as const }}
-            className="hidden overflow-hidden border-l border-border bg-surface/95 lg:block"
+            className="absolute lg:relative right-0 top-0 h-full overflow-hidden border-l border-border bg-surface/95 z-20 w-full lg:w-auto"
           >
-            <div className="flex h-full w-[380px] flex-col overflow-y-auto p-6">
+            <div className="flex h-full w-full lg:w-[380px] flex-col overflow-y-auto p-6">
               <div className="flex items-start justify-between mb-6">
                 <div>
                   <p className="text-xs text-text-muted">{selectedCase.id}</p>

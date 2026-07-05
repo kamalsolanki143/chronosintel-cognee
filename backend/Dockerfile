@@ -27,7 +27,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 FROM base AS deps
 
 WORKDIR /install
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --upgrade pip && \
     pip install --prefix=/install/python-packages -r requirements.txt
 
@@ -45,12 +45,13 @@ WORKDIR /app
 # Copy installed packages
 COPY --from=deps /install/python-packages /usr/local
 
-# Copy application code
-COPY . .
+# Copy application code and sibling AI package from the repository root build context
+COPY backend /app/backend
+COPY ai /app/ai
 
-# Copy AI module (sibling directory)
-# Note: in docker-compose this is mounted as a volume
-# COPY ../ai /ai
+
+# Ensure runtime imports resolve the backend app package and the sibling ai package
+WORKDIR /app/backend
 
 # Create storage directories
 RUN mkdir -p /storage/uploads /storage/processed /storage/reports /storage/cognee_db && \

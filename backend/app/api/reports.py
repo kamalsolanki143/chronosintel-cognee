@@ -16,12 +16,12 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.database import get_db
-from app.database.models import Report
-from app.database.schemas import ReportRequest, ReportResponse
-from app.services.case_memory import case_memory_service
-from app.services.report_generator import report_generator_service
-from app.utils.exceptions import CaseNotFoundError
+from backend.app.database.database import get_db
+from backend.app.database.models import Report
+from backend.app.database.schemas import ReportRequest, ReportResponse
+from backend.app.services.case_memory import case_memory_service
+from backend.app.services.report_generator import report_generator_service
+from backend.app.utils.exceptions import CaseNotFoundError
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

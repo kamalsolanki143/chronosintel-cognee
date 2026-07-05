@@ -25,8 +25,8 @@ from tenacity import (
     wait_exponential,
 )
 
-from app.config import settings
-from app.utils.exceptions import GeminiError
+from backend.app.config import settings
+from backend.app.utils.exceptions import GeminiError
 
 logger = logging.getLogger(__name__)
 

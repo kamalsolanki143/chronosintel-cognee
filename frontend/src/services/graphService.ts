@@ -1,5 +1,6 @@
 import { apiFetch } from './apiClient';
 import type { GraphNode, GraphLink } from './mockData';
+import { getStoredGraphData } from './mockStorage';
 
 export async function fetchGraphData(
   caseId: string
@@ -37,15 +38,22 @@ export async function fetchGraphData(
       label: e.label,
     }));
 
+    if (nodes.length === 0) {
+      return getStoredGraphData(caseId);
+    }
+
     return { nodes, links };
   } catch (_) {
-    return { nodes: [], links: [] };
+    return getStoredGraphData(caseId);
   }
 }
 
 export async function fetchNodeDetails(
   nodeId: string
 ): Promise<GraphNode | undefined> {
-  // Nodes are fetched in bulk with fetchGraphData, but we can look it up or return dummy.
-  return undefined;
+  // Try to find the node inside stored graph data
+  const cases = getStoredGraphData('CASE-001'); // default to CASE-001 or find from all nodes
+  const node = cases.nodes.find(n => n.id === nodeId);
+  return node;
 }
+

@@ -24,8 +24,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from app.database.models import DocumentType
-from app.utils.exceptions import DocumentProcessingError, UnsupportedFileTypeError
+from backend.app.database.models import DocumentType
+from backend.app.utils.exceptions import DocumentProcessingError, UnsupportedFileTypeError
 
 logger = logging.getLogger(__name__)
 

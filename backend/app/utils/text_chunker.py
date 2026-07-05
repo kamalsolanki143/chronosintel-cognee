@@ -17,7 +17,7 @@ import re
 import logging
 from dataclasses import dataclass
 
-from app.config import settings
+from backend.app.config import settings
 
 logger = logging.getLogger(__name__)
 

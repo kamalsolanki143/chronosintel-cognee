@@ -21,15 +21,15 @@ from typing import Optional
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.database import get_db
-from app.database.models import CaseStatus, DocumentType
-from app.database.schemas import CaseUpdateResponse, VersionDiff
-from app.services.case_memory import case_memory_service
-from app.services.change_detector import change_detector_service
-from app.services.graph_builder import graph_builder_service
-from app.services.ingestion_service import ingestion_service
-from app.services.version_manager import version_manager_service
-from app.utils.exceptions import CaseNotFoundError
+from backend.app.database.database import get_db
+from backend.app.database.models import CaseStatus, DocumentType
+from backend.app.database.schemas import CaseUpdateResponse, VersionDiff
+from backend.app.services.case_memory import case_memory_service
+from backend.app.services.change_detector import change_detector_service
+from backend.app.services.graph_builder import graph_builder_service
+from backend.app.services.ingestion_service import ingestion_service
+from backend.app.services.version_manager import version_manager_service
+from backend.app.utils.exceptions import CaseNotFoundError
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

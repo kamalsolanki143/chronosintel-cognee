@@ -24,8 +24,8 @@ from dateutil import parser as dateutil_parser
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.models import Event
-from app.database.schemas import TimelineEvent, TimelineResponse
+from backend.app.database.models import Event
+from backend.app.database.schemas import TimelineEvent, TimelineResponse
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +59,7 @@ class TimelineEngineService:
         Returns:
             TimelineResponse with sorted events and date range.
         """
-        from app.services.case_memory import case_memory_service
+        from backend.app.services.case_memory import case_memory_service
 
         await case_memory_service.get_case(db, case_id)
 

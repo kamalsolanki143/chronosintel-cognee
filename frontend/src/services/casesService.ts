@@ -1,5 +1,6 @@
 import { apiFetch } from './apiClient';
 import type { Case, CaseUpdate } from './mockData';
+import { getStoredCases, addStoredCase } from './mockStorage';
 
 function mapBackendCase(backendCase: any, memoryData?: any): Case {
   const statusMap: Record<string, Case['status']> = {
@@ -41,16 +42,23 @@ function mapVersionToCaseUpdate(v: any, caseId: string): CaseUpdate {
 }
 
 export async function fetchCases(): Promise<Case[]> {
-  const data = await apiFetch<{ cases: any[] }>('/api/investigation/cases');
-  const mapped = await Promise.all(data.cases.map(async (c) => {
-    try {
-      const memory = await apiFetch<any>(`/api/memory/${c.id}`);
-      return mapBackendCase(c, memory);
-    } catch (_) {
-      return mapBackendCase(c);
+  try {
+    const data = await apiFetch<{ cases: any[] }>('/api/investigation/cases');
+    if (!data || !data.cases || data.cases.length === 0) {
+      return getStoredCases();
     }
-  }));
-  return mapped;
+    const mapped = await Promise.all(data.cases.map(async (c) => {
+      try {
+        const memory = await apiFetch<any>(`/api/memory/${c.id}`);
+        return mapBackendCase(c, memory);
+      } catch (_) {
+        return mapBackendCase(c);
+      }
+    }));
+    return mapped;
+  } catch (_) {
+    return getStoredCases();
+  }
 }
 
 export async function fetchCaseById(id: string): Promise<Case | undefined> {
@@ -59,28 +67,47 @@ export async function fetchCaseById(id: string): Promise<Case | undefined> {
     const memory = await apiFetch<any>(`/api/memory/${id}`);
     return mapBackendCase(caseData, memory);
   } catch (err) {
-    console.error("fetchCaseById failed:", err);
-    return undefined;
+    console.warn("fetchCaseById failed, using stored cases fallback:", err);
+    return getStoredCases().find(c => c.id === id);
   }
 }
 
 export async function fetchCaseUpdates(caseId: string): Promise<CaseUpdate[]> {
   try {
     const versions = await apiFetch<any[]>(`/api/memory/${caseId}/versions`);
+    if (!versions || versions.length === 0) {
+      return getStoredTimelineEvents(caseId) as unknown as CaseUpdate[];
+    }
     return versions.map(v => mapVersionToCaseUpdate(v, caseId));
   } catch (_) {
-    return [];
+    // Return mock updates mapped from timeline events
+    const events = getStoredTimelineEvents(caseId);
+    return events.map((ev, idx) => ({
+      id: `upd-${ev.id}`,
+      caseId,
+      type: ev.category === 'incident' ? 'entity_discovered' : 'evidence_added',
+      description: ev.description,
+      timestamp: ev.timestamp,
+      user: ev.source
+    }));
   }
 }
 
+// Fallback helper to import events
+import { getStoredTimelineEvents } from './mockStorage';
+
 export async function createCase(title: string, description: string, investigator: string): Promise<Case> {
-  const res = await apiFetch<any>('/api/investigation/cases', {
-    method: 'POST',
-    body: JSON.stringify({
-      title,
-      description,
-      investigator,
-    }),
-  });
-  return mapBackendCase(res);
+  try {
+    const res = await apiFetch<any>('/api/investigation/cases', {
+      method: 'POST',
+      body: JSON.stringify({
+        title,
+        description,
+        investigator,
+      }),
+    });
+    return mapBackendCase(res);
+  } catch (_) {
+    return addStoredCase(title, description, investigator);
+  }
 }

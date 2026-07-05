@@ -18,13 +18,13 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.database import get_db
-from app.database.models import Document, Entity, Event, Relationship
-from app.database.schemas import MemoryStateResponse, VersionDiff, VersionSnapshot, EntityResponse
-from app.services.case_memory import case_memory_service
-from app.services.change_detector import change_detector_service
-from app.services.version_manager import version_manager_service
-from app.utils.exceptions import CaseNotFoundError, VersionNotFoundError
+from backend.app.database.database import get_db
+from backend.app.database.models import Document, Entity, Event, Relationship
+from backend.app.database.schemas import MemoryStateResponse, VersionDiff, VersionSnapshot, EntityResponse
+from backend.app.services.case_memory import case_memory_service
+from backend.app.services.change_detector import change_detector_service
+from backend.app.services.version_manager import version_manager_service
+from backend.app.utils.exceptions import CaseNotFoundError, VersionNotFoundError
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

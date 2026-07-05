@@ -22,8 +22,8 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.config import settings
-from app.database.models import (
+from backend.app.config import settings
+from backend.app.database.models import (
     Case,
     CaseStatus,
     CaseVersion,
@@ -32,8 +32,8 @@ from app.database.models import (
     Event,
     Relationship,
 )
-from app.database.schemas import CaseCreate, CaseUpdate
-from app.utils.exceptions import CaseAlreadyExistsError, CaseNotFoundError
+from backend.app.database.schemas import CaseCreate, CaseUpdate
+from backend.app.utils.exceptions import CaseAlreadyExistsError, CaseNotFoundError
 
 logger = logging.getLogger(__name__)
 

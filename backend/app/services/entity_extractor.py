@@ -17,8 +17,8 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.models import Document, DocumentStatus, Entity, EntityType
-from app.services.graph_builder import GraphBuilderService
+from backend.app.database.models import Document, DocumentStatus, Entity, EntityType
+from backend.app.services.graph_builder import GraphBuilderService
 
 logger = logging.getLogger(__name__)
 

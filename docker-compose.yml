@@ -24,9 +24,9 @@ services:
   # ──────────────────────────────────────────────────────────────────
   backend:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
-    working_dir: /app
+    working_dir: /app/backend
     command: >
       sh -c "uvicorn app.main:app
              --host 0.0.0.0
@@ -42,8 +42,8 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/app           # Live code reload in dev
-      - ./ai:/ai                 # AI module access
+      - ./backend:/app/backend   # Live code reload in dev
+      - ./ai:/app/ai             # AI module access
       - ./storage:/storage       # Persistent file storage
     depends_on:
       db:

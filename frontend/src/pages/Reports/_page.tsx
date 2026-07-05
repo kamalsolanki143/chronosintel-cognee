@@ -101,7 +101,7 @@ export default function ReportsPage() {
               <h1 className="text-3xl font-bold tracking-tight text-text">Reports</h1>
               <p className="mt-1 text-text-secondary">Generate and manage investigation reports</p>
             </div>
-            <button className="flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-primary-dark active:scale-[0.98] shadow-lg shadow-primary/20">
+            <button className="fixed bottom-6 right-6 sm:static z-30 flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-primary-dark active:scale-[0.98] shadow-lg shadow-primary/20">
               <Plus size={16} />
               Generate Report
             </button>
@@ -159,7 +159,7 @@ export default function ReportsPage() {
 
           {/* Loading */}
           {loading ? (
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
               {Array.from({ length: 3 }).map((_, i) => (
                 <Skeleton key={i} className="h-44 rounded-xl" />
               ))}
@@ -175,7 +175,7 @@ export default function ReportsPage() {
             </motion.div>
           ) : (
             /* Report Cards Grid */
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
               {filteredReports.map((report) => {
                 const StatusIcon = statusIcons[report.status] || FileText;
                 const statusColor = statusColors[report.status] || 'bg-gray-500/10 text-gray-500';

@@ -20,15 +20,15 @@ from datetime import datetime, timezone
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database.models import (
+from backend.app.database.models import (
     CaseVersion,
     Document,
     Entity,
     Event,
     Relationship,
 )
-from app.database.schemas import VersionSnapshot
-from app.utils.exceptions import CaseNotFoundError, VersionNotFoundError
+from backend.app.database.schemas import VersionSnapshot
+from backend.app.utils.exceptions import CaseNotFoundError, VersionNotFoundError
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +64,7 @@ class VersionManagerService:
         Returns:
             Created CaseVersion ORM object.
         """
-        from app.services.case_memory import case_memory_service
+        from backend.app.services.case_memory import case_memory_service
 
         # Validate case exists
         await case_memory_service.get_case(db, case_id)

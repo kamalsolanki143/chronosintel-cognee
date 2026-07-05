@@ -21,10 +21,10 @@ import aiofiles
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.config import settings
-from app.database.models import Entity, Event, Report
-from app.database.schemas import ReportResponse
-from app.utils.exceptions import CaseNotFoundError
+from backend.app.config import settings
+from backend.app.database.models import Entity, Event, Report
+from backend.app.database.schemas import ReportResponse
+from backend.app.utils.exceptions import CaseNotFoundError
 
 logger = logging.getLogger(__name__)
 
@@ -63,8 +63,8 @@ class ReportGeneratorService:
         Returns:
             ReportResponse with HTML content and structured findings.
         """
-        from app.services.case_memory import case_memory_service
-        from app.services.evidence_chain import evidence_chain_service
+        from backend.app.services.case_memory import case_memory_service
+        from backend.app.services.evidence_chain import evidence_chain_service
         from ai.cognee.temporal_search import temporal_search_engine
         from ai.gemini.client import gemini_client
 

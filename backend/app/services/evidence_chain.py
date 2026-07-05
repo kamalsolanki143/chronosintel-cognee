@@ -21,9 +21,9 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.config import settings
-from app.database.models import Document, Entity, Evidence, EvidenceType
-from app.database.schemas import EvidenceChainItem, EvidenceItem
+from backend.app.config import settings
+from backend.app.database.models import Document, Entity, Evidence, EvidenceType
+from backend.app.database.schemas import EvidenceChainItem, EvidenceItem
 
 logger = logging.getLogger(__name__)
 

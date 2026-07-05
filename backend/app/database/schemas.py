@@ -13,7 +13,7 @@ from typing import Any, Optional
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
-from app.database.models import (
+from backend.app.database.models import (
     CaseStatus,
     DocumentStatus,
     DocumentType,
